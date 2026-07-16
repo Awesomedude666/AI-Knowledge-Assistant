@@ -1,10 +1,20 @@
-from fastapi import APIRouter
-from app.services.document_service import Document_Service
+from fastapi import APIRouter, File, Form, UploadFile
 
-router = APIRouter()
-document_service = Document_Service()
+from app.dependencies.services import document_service
+
+router = APIRouter(
+    prefix="/documents",
+    tags=["Documents"],
+)
+
 
 @router.post("/upload")
-async def upload():
-    await document_service.upload_document()
-    return {"message": "Document uploaded successfully."}
+async def upload_document(
+    user_id: str = Form(...),
+    file: UploadFile = File(...),
+):
+
+    return document_service.upload_document(
+        file=file,
+        user_id=user_id,
+    )

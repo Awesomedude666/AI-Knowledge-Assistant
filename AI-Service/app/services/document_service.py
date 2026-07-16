@@ -1,4 +1,93 @@
-class Document_Service:
+import os
+import shutil
+import uuid
 
-    def upload_document():
-        print("Uploading document...")
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from app.config.settings import settings
+from app.loaders.pdf_loader import PDFLoader
+from app.vectorstore.chroma_service import ChromaService
+
+
+class DocumentService:
+
+    def __init__(
+        self,
+        pdf_loader: PDFLoader,
+        chroma_service: ChromaService,
+    ):
+
+        self.pdf_loader = pdf_loader
+        self.chroma_service = chroma_service
+
+    def upload_document(
+        self,
+        file,
+        user_id: str,
+    ):
+
+        document_id = str(uuid.uuid4())
+
+        user_upload_dir = os.path.join(
+            settings.UPLOAD_DIR,
+            user_id,
+        )
+
+        os.makedirs(
+            user_upload_dir,
+            exist_ok=True,
+        )
+
+        filename = f"{document_id}.pdf"
+
+        file_path = os.path.join(
+            user_upload_dir,
+            filename,
+        )
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(
+                file.file,
+                buffer,
+            )
+
+        documents = self.pdf_loader.load(file_path)
+
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=settings.CHUNK_SIZE,
+            chunk_overlap=settings.CHUNK_OVERLAP,
+            separators=[
+                "\n\n",
+                "\n",
+                ". ",
+                " ",
+                "",
+            ],
+        )
+
+        chunks = splitter.split_documents(documents)
+
+        for index, chunk in enumerate(chunks):
+
+            chunk.metadata["user_id"] = user_id
+
+            chunk.metadata["document_id"] = document_id
+
+            chunk.metadata["chunk_id"] = index
+
+            chunk.metadata["filename"] = file.filename
+
+        self.chroma_service.add_documents(chunks)
+
+        return {
+
+            "document_id": document_id,
+
+            "filename": file.filename,
+
+            "stored_filename": filename,
+
+            "total_chunks": len(chunks),
+
+            "status": "processed",
+        }

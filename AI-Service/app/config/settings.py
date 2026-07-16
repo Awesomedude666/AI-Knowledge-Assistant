@@ -19,5 +19,8 @@ class Settings:
 
         self.UPLOAD_DIR = os.getenv("UPLOAD_DIR")
 
+        self.CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 1000))
+        self.CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 200))
+
 
 settings = Settings()
