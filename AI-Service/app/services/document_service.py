@@ -7,6 +7,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.config.settings import settings
 from app.loaders.pdf_loader import PDFLoader
 from app.vectorstore.chroma_service import ChromaService
+from app.retrievers.bm25_retriever import BM25RetrieverService
 
 
 class DocumentService:
@@ -15,10 +16,12 @@ class DocumentService:
         self,
         pdf_loader: PDFLoader,
         chroma_service: ChromaService,
+        bm25_retriever: BM25RetrieverService,
     ):
 
         self.pdf_loader = pdf_loader
         self.chroma_service = chroma_service
+        self.bm25_retriever = bm25_retriever
 
     def upload_document(
         self,
@@ -66,6 +69,7 @@ class DocumentService:
         )
 
         chunks = splitter.split_documents(documents)
+        print(f"Created {len(chunks)} chunks")
 
         for index, chunk in enumerate(chunks):
 
@@ -78,6 +82,13 @@ class DocumentService:
             chunk.metadata["filename"] = file.filename
 
         self.chroma_service.add_documents(chunks)
+        print("Stored in Chroma")
+
+        self.bm25_retriever.add_documents(
+            user_id=user_id,
+            documents=chunks,
+        )
+        print("Updated BM25")
 
         return {
 

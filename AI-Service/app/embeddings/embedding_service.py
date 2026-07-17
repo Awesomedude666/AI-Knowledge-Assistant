@@ -10,7 +10,7 @@ class EmbeddingService:
 
     def __init__(self):
         self.embedding_model = GoogleGenerativeAIEmbeddings(
-            model="models/text-embedding-004",
+            model="gemini-embedding-001",
             google_api_key=settings.GOOGLE_API_KEY,
         )
 

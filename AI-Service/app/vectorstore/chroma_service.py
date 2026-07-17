@@ -1,7 +1,11 @@
+from xml.dom.minidom import Document
+
 from langchain_chroma import Chroma
 
 from app.config.settings import settings
 from app.embeddings.embedding_service import EmbeddingService
+from typing import List
+from langchain_core.documents import Document
 
 
 class ChromaService:
@@ -54,3 +58,46 @@ class ChromaService:
                 "document_id": document_id
             }
         )
+
+
+    def get_all_user_ids(self) -> list[str]:
+
+        results = self.vector_store.get(
+            include=["metadatas"],
+        )
+
+        user_ids = {
+            metadata["user_id"]
+            for metadata in results["metadatas"]
+            if metadata is not None
+        }
+
+        return list(user_ids)
+    
+
+
+    def get_documents(
+        self,
+        user_id: str,
+    ) -> list[Document]:
+
+        results = self.vector_store.get(
+            where={
+                "user_id": user_id,
+            },
+            include=[
+                "documents",
+                "metadatas",
+            ],
+        )
+
+        return [
+            Document(
+                page_content=document,
+                metadata=metadata,
+            )
+            for document, metadata in zip(
+                results["documents"],
+                results["metadatas"],
+            )
+        ]
