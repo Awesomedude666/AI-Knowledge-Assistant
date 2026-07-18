@@ -1,6 +1,8 @@
 import os
 import shutil
 import uuid
+import logging
+import time
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -8,6 +10,9 @@ from app.config.settings import settings
 from app.loaders.pdf_loader import PDFLoader
 from app.vectorstore.chroma_service import ChromaService
 from app.retrievers.bm25_retriever import BM25RetrieverService
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class DocumentService:
@@ -29,7 +34,9 @@ class DocumentService:
         user_id: str,
     ):
 
+        started_at = time.monotonic()
         document_id = str(uuid.uuid4())
+        logger.info("Processing document upload user_id=%s document_id=%s filename=%s", user_id, document_id, file.filename)
 
         user_upload_dir = os.path.join(
             settings.UPLOAD_DIR,
@@ -69,7 +76,7 @@ class DocumentService:
         )
 
         chunks = splitter.split_documents(documents)
-        print(f"Created {len(chunks)} chunks")
+        logger.info("Document split user_id=%s document_id=%s chunks=%d", user_id, document_id, len(chunks))
 
         for index, chunk in enumerate(chunks):
 
@@ -82,13 +89,13 @@ class DocumentService:
             chunk.metadata["filename"] = file.filename
 
         self.chroma_service.add_documents(chunks)
-        print("Stored in Chroma")
+        logger.info("Document stored in Chroma user_id=%s document_id=%s", user_id, document_id)
 
         self.bm25_retriever.add_documents(
             user_id=user_id,
             documents=chunks,
         )
-        print("Updated BM25")
+        logger.info("BM25 updated user_id=%s document_id=%s duration_ms=%d", user_id, document_id, (time.monotonic() - started_at) * 1000)
 
         return {
 

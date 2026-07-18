@@ -10,12 +10,18 @@ from app.dependencies.services import (
     bm25_retriever,
     chroma_service,
 )
+from app.utils.logger import setup_logger
+setup_logger()
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    print("========== Building BM25 Indexes ==========")
+    logger.info("========== BM25 Building ==========")
 
     user_ids = chroma_service.get_all_user_ids()
 
@@ -25,8 +31,8 @@ async def lifespan(app: FastAPI):
             user_id=user_id,
         )
 
-        print(f"User: {user_id}")
-        print(f"Chunks: {len(documents)}")
+        logger.info(f"User: {user_id}")
+        logger.info(f"Chunks: {len(documents)}")
 
 
         bm25_retriever.build_index(
@@ -34,7 +40,7 @@ async def lifespan(app: FastAPI):
             documents=documents,
         )
     
-    print("========== BM25 Ready ==========")
+    logger.info("========== BM25 Ready ==========")
 
     yield
 

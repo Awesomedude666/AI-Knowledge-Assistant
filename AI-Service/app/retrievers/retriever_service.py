@@ -10,7 +10,9 @@ from app.vectorstore.chroma_service import ChromaService
 from app.retrievers.hybrid_retriever import HybridRetriever
 from app.retrievers.bm25_retriever import BM25RetrieverService
 from app.retrievers.reranker import RerankerService
-from langchain_classic.retrievers import ContextualCompressionRetriever
+import time
+import logging
+logger = logging.getLogger(__name__)
 
 
 class RetrieverService:
@@ -67,16 +69,21 @@ class RetrieverService:
             k=20,
         )
         
-        compression_retriever = ContextualCompressionRetriever(
-            base_retriever=hybrid_retriever,
-            base_compressor=self.reranker_service.get_reranker(),
-        )
-
 
         documents = self.multi_query_retriever.invoke(
             question=standalone_question,
-            retriever=compression_retriever,
+            retriever=hybrid_retriever
         )
+        
+        start = time.perf_counter()
+        
+        documents = self.reranker_service.get_reranker().compress_documents(
+            documents=documents,
+            query=standalone_question,
+        )
+        
+        elapsed = time.perf_counter() - start
+        logger.info("Reranking took %.3f ms", elapsed*1000)
 
         return documents
 

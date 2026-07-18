@@ -1,6 +1,11 @@
 from app.llm.llm_service import LLMService
 from app.prompts.history_prompt import HISTORY_PROMPT
 
+import logging
+import time
+
+logger = logging.getLogger(__name__)
+
 
 class HistoryRetriever:
 
@@ -24,16 +29,17 @@ class HistoryRetriever:
             }
         )
 
+        start = time.perf_counter()
+        
         response = self.llm.invoke(prompt)
+        
+        elapsed = time.perf_counter() - start
+        logger.info("History Retriever took %.3f ms", elapsed*1000)
 
-        print("=" * 80)
-        print("Original Question:")
-        print(question)
-
-        print()
-
-        print("Rewritten Question:")
-        print(response.content)
-        print("=" * 80)
+        logger.info("Chat question rewritten history_messages=%d", len(chat_history))
+        logger.info(
+            "Standalone question: %s",
+            response.content
+        )
 
         return response.content

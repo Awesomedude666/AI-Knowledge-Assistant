@@ -1,6 +1,11 @@
 from app.chains.rag_chain import RAGChain
 from app.retrievers.retriever_service import RetrieverService
 
+import logging
+import time
+
+logger = logging.getLogger(__name__)
+
 # we are importing these classes only for type checking in the chatService.
 # chat service takes object of these classes as input in the constructor. So we need to import them for type checking.
 
@@ -22,16 +27,23 @@ class ChatService:
         chat_history,
     ):
 
+        start = time.perf_counter()
+        logger.info("Retrieving chat context user_id=%s history_messages=%d", user_id, len(chat_history))
         documents = self.retriever_service.retrieve(
             question=question,
             user_id=user_id,
             chat_history=chat_history,
         )
 
+        logger.info("Generating chat answer user_id=%s retrieved_documents=%d", user_id, len(documents))
+        
         answer = self.rag_chain.invoke(
             question=question,
             documents=documents,
         )
+        
+        elapsed = time.perf_counter() - start
+        logger.info("Chat service took %.3f ms", elapsed*1000)
 
         return {
             "answer": answer,

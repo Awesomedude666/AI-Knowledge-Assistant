@@ -5,7 +5,11 @@ from langchain_chroma import Chroma
 from app.config.settings import settings
 from app.embeddings.embedding_service import EmbeddingService
 from typing import List
+import logging
 from langchain_core.documents import Document
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ChromaService:
@@ -15,6 +19,7 @@ class ChromaService:
 
     def __init__(self, embedding_service: EmbeddingService):
 
+        logger.info("Initializing Chroma vector store path=%s", settings.CHROMA_DB_PATH)
         self.vector_store = Chroma(
             persist_directory=settings.CHROMA_DB_PATH,
             embedding_function=embedding_service.get_embedding_model(),
@@ -24,12 +29,14 @@ class ChromaService:
         """
         Stores documents in Chroma.
         """
+        logger.info("Adding documents to Chroma count=%d", len(documents))
         self.vector_store.add_documents(documents)
 
     def similarity_search(self, query, k=5, filter=None):
         """
         Performs similarity search.
         """
+        logger.debug("Chroma similarity search k=%d filter=%s", k, bool(filter))
         return self.vector_store.similarity_search(
             query=query,
             k=k,

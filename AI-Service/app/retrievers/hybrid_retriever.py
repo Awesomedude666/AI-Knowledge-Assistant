@@ -7,6 +7,11 @@ from app.retrievers.bm25_retriever import BM25RetrieverService
 from app.vectorstore.chroma_service import ChromaService
 from app.retrievers.rrf import reciprocal_rank_fusion
 
+import logging
+import time
+
+logger = logging.getLogger(__name__)
+
 
 class HybridRetriever(BaseRetriever):
 
@@ -32,24 +37,28 @@ class HybridRetriever(BaseRetriever):
             },
         )
 
+        start = time.perf_counter()
+        
         vector_documents = vector_retriever.invoke(query)
+        
+        elapsed = time.perf_counter() - start
+        logger.info("Vector search took %.3f ms", elapsed*1000)
 
-        print("\n========== Vector Search ==========")
-        print(f"Retrieved {len(vector_documents)} documents")
+        logger.info("Vector search completed user_id=%s documents=%d", self.user_id, len(vector_documents))
 
-        for doc in vector_documents:
-            print(doc.metadata["chunk_id"])
-
+        start = time.perf_counter()
+        
         bm25_documents = self.bm25_retriever.invoke(
             user_id=self.user_id,
             query=query,
         )
+        
+        elapsed = time.perf_counter() - start
+        logger.info("BM25 search took %.3f ms", elapsed*1000)
 
-        print("\n========== BM25 ==========")
-        print(f"Retrieved {len(bm25_documents)} documents")
+        logger.info("BM25 search completed user_id=%s documents=%d", self.user_id, len(bm25_documents))
 
-        for doc in bm25_documents:
-            print(doc.metadata["chunk_id"])
+        start = time.perf_counter()
 
         documents = reciprocal_rank_fusion(
             [
@@ -57,11 +66,10 @@ class HybridRetriever(BaseRetriever):
                 bm25_documents,
             ]
         )
+        
+        elapsed = time.perf_counter() - start
+        logger.info("Local RRF took %.3f ms", elapsed*1000)
 
-        print("\n========== RRF ==========")
-        print(f"Retrieved {len(documents)} documents")
-
-        for document in documents:
-            print(document.metadata["chunk_id"])
+        logger.info("Hybrid retrieval fused user_id=%s documents=%d", self.user_id, len(documents))
 
         return documents[: self.k]

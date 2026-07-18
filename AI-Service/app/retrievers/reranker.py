@@ -3,6 +3,11 @@ from langchain_classic.retrievers.document_compressors import (
 )
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 
+import logging
+import time
+
+logger = logging.getLogger(__name__)
+
 
 class RerankerService:
 
@@ -12,6 +17,7 @@ class RerankerService:
         top_n: int = 5,
     ):
 
+        logger.info("Initializing reranker model=%s top_n=%d", model_name, top_n)
         model = HuggingFaceCrossEncoder(
             model_name=model_name,
         )

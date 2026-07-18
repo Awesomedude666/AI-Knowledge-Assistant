@@ -1,6 +1,10 @@
 from app.llm.llm_service import LLMService
 from app.prompts.rag_prompt import RAG_PROMPT
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class RAGChain:
 
@@ -16,6 +20,7 @@ class RAGChain:
         documents,
     ):
 
+        logger.info("Invoking RAG chain documents=%d", len(documents))
         context = "\n\n".join(
             document.page_content
             for document in documents
@@ -29,5 +34,6 @@ class RAGChain:
         )
 
         response = self.llm.invoke(prompt)
+        logger.info("RAG chain completed")
 
         return response.content

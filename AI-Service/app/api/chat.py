@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter
 
 from app.dependencies.services import chat_service
@@ -7,7 +9,6 @@ router = APIRouter(
     prefix="/chat",
     tags=["Chat"],
 )
-
 
 @router.post("/")
 async def chat(request: ChatRequest):
