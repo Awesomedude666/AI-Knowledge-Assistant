@@ -108,3 +108,10 @@ class ChromaService:
                 results["metadatas"],
             )
         ]
+        
+    def delete_document(self, document_id):
+        self.vector_store.delete(
+            where={
+                "document_id": document_id
+            }
+     )

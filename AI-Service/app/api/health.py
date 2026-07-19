@@ -14,3 +14,4 @@ def health():
         "application": settings.APP_NAME,
         "environment": settings.APP_ENV
     }
+    
