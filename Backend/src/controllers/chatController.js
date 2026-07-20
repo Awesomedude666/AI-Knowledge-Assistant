@@ -1,4 +1,5 @@
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import Chat from "../models/Chat.js";
 
@@ -6,22 +7,19 @@ export const chat = async (req, res) => {
   try {
     const { sessionId, question } = req.body;
 
-    if (!sessionId) {
-      return res.status(400).json({
-        message: "Session ID is required.",
-      });
-    }
-
     if (!question || question.trim() === "") {
       return res.status(400).json({
         message: "Question is required.",
       });
     }
 
+    // Generate a new session ID if this is a new conversation
+    const currentSessionId = sessionId || uuidv4();
+
     // Fetch previous messages for this session
     const chats = await Chat.find({
       user: req.user._id,
-      sessionId,
+      sessionId: currentSessionId,
     }).sort({ createdAt: 1 });
 
     // Convert MongoDB chats to FastAPI chat history format
@@ -54,23 +52,26 @@ export const chat = async (req, res) => {
     // Save latest chat
     await Chat.create({
       user: req.user._id,
-      sessionId,
+      sessionId: currentSessionId,
       question,
       answer,
     });
 
     return res.status(200).json({
+      sessionId: currentSessionId,
       answer,
     });
   } catch (error) {
-  console.error("Chat Error:", error.response?.data || error.message);
+    console.error(
+      "Chat Error:",
+      error.response?.data || error.message
+    );
 
-  return res.status(500).json({
-    message: "Failed to generate response.",
-  });
+    return res.status(500).json({
+      message: "Failed to generate response.",
+    });
   }
 };
-
 
 export const getChatHistory = async (req, res) => {
   try {
@@ -90,8 +91,6 @@ export const getChatHistory = async (req, res) => {
     });
   }
 };
-
-
 
 export const getSessions = async (req, res) => {
   try {
@@ -133,7 +132,6 @@ export const getSessions = async (req, res) => {
     });
   }
 };
-
 
 export const deleteSession = async (req, res) => {
   try {
