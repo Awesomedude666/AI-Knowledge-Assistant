@@ -1,10 +1,9 @@
 from app.chains.rag_chain import RAGChain
 from app.retrievers.retriever_service import RetrieverService
 
-import logging
 import time
 
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 # we are importing these classes only for type checking in the chatService.
 # chat service takes object of these classes as input in the constructor. So we need to import them for type checking.

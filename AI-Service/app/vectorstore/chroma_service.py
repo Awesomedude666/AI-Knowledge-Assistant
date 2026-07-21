@@ -8,8 +8,7 @@ from typing import List
 import logging
 from langchain_core.documents import Document
 
-import logging
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class ChromaService:

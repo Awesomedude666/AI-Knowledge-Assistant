@@ -11,8 +11,7 @@ from app.retrievers.hybrid_retriever import HybridRetriever
 from app.retrievers.bm25_retriever import BM25RetrieverService
 from app.retrievers.reranker import RerankerService
 import time
-import logging
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class RetrieverService:

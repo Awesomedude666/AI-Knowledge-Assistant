@@ -6,10 +6,9 @@ from app.llm.llm_service import LLMService
 
 from app.retrievers.rrf import reciprocal_rank_fusion
 
-import logging
 import time
 
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class MultiQueryRetrieverService:

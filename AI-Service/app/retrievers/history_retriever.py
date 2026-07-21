@@ -1,10 +1,9 @@
 from app.llm.llm_service import LLMService
 from app.prompts.history_prompt import HISTORY_PROMPT
 
-import logging
 import time
 
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class HistoryRetriever:

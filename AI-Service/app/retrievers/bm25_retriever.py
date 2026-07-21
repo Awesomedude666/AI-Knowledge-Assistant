@@ -1,9 +1,7 @@
 from langchain_core.documents import Document
 from langchain_community.retrievers import BM25Retriever
 
-import logging
-
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class BM25RetrieverService:

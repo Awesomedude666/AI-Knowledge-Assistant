@@ -1,6 +1,5 @@
 import os
 import shutil
-import logging
 import time
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -10,7 +9,7 @@ from app.loaders.pdf_loader import PDFLoader
 from app.vectorstore.chroma_service import ChromaService
 from app.retrievers.bm25_retriever import BM25RetrieverService
 
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class DocumentService:

@@ -10,12 +10,8 @@ from app.dependencies.services import (
     bm25_retriever,
     chroma_service,
 )
-from app.utils.logger import setup_logger
-setup_logger()
 
-import logging
-
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 @asynccontextmanager

@@ -7,7 +7,7 @@ function Register() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
   });
@@ -48,9 +48,9 @@ function Register() {
 
         <input
           type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
+          name="name"
+          placeholder="Name"
+          value={formData.name}
           onChange={handleChange}
           className="mb-4 w-full rounded border p-3"
           required

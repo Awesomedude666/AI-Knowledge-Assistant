@@ -3,10 +3,9 @@ from langchain_classic.retrievers.document_compressors import (
 )
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 
-import logging
 import time
 
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class RerankerService:

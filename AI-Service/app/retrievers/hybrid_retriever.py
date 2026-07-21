@@ -7,10 +7,10 @@ from app.retrievers.bm25_retriever import BM25RetrieverService
 from app.vectorstore.chroma_service import ChromaService
 from app.retrievers.rrf import reciprocal_rank_fusion
 
-import logging
-import time
 
-logger = logging.getLogger(__name__)
+import time
+from app.utils.logger import logger
+
 
 
 class HybridRetriever(BaseRetriever):

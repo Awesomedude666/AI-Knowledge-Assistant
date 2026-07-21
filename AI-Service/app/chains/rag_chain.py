@@ -1,9 +1,7 @@
 from app.llm.llm_service import LLMService
 from app.prompts.rag_prompt import RAG_PROMPT
 
-import logging
-
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
 
 
 class RAGChain:
