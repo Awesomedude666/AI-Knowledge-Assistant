@@ -112,6 +112,10 @@ class DocumentService:
             (time.monotonic() - started_at) * 1000,
         )
 
+        # Remove the temporary PDF after successful processing
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
         return {
             "document_id": document_id,
             "filename": file.filename,
@@ -119,23 +123,12 @@ class DocumentService:
             "total_chunks": len(chunks),
             "status": "processed",
         }
-        
-        
+
     def delete_document(
         self,
-        user_id: str,
         document_id: str,
     ):
         self.chroma_service.delete_document(document_id)
-
-        file_path = os.path.join(
-            settings.UPLOAD_DIR,
-            user_id,
-            f"{document_id}.pdf",
-        )
-
-        if os.path.exists(file_path):
-            os.remove(file_path)
 
         return {
             "message": "Document deleted successfully."

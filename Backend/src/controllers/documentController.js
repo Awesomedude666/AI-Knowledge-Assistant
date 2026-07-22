@@ -1,7 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import FormData from "form-data";
-
+import mongoose from "mongoose";
 import Document from "../models/Document.js";
 
 export const uploadDocument = async (req, res) => {

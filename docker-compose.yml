@@ -1,0 +1,39 @@
+services:
+  frontend:
+    build:
+      context: ./Frontend
+    container_name: knowledge-assistant-frontend
+    ports:
+      - "80:80"
+    env_file:
+      - ./Frontend/.env
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./Backend
+    container_name: knowledge-assistant-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./Backend/.env
+    depends_on:
+      - ai-service
+    restart: unless-stopped
+
+  ai-service:
+    build:
+      context: ./AI-Service
+    container_name: knowledge-assistant-ai
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./AI-Service/.env
+    volumes:
+      - chroma_data:/app/chroma_db
+    restart: unless-stopped
+
+volumes:
+  chroma_data:

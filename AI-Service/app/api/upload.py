@@ -29,6 +29,5 @@ async def delete_document(
     document_id: str,
 ):
     return document_service.delete_document(
-        user_id=user_id,
         document_id=document_id,
     )
